@@ -1,0 +1,32 @@
+name: Product Service CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t product-service:latest .
+
+      - name: Test Docker image
+        run: docker run -d -p 3002:3002 --name product-service-test product-service:latest
+
+      - name: Test application
+        run: |
+          sleep 5
+          curl http://localhost:3002
+
+      - name: Stop container
+        run: docker stop product-service-test
